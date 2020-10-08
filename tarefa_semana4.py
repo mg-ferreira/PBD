@@ -1,6 +1,6 @@
 from collections import Counter, defaultdict
 from matplotlib import pyplot as plt
-import math
+import math, random
 
 users = [
     {"id": 0, "name": "Hero"}, 
@@ -407,7 +407,7 @@ def histograma_amizades_por_sexo_do_usuario():
     # print(xs)
     # print(ys)
 
-histograma_amizades_por_sexo_do_usuario()
+# histograma_amizades_por_sexo_do_usuario()
 
 
 # 2 - Escreva uma função que constrói um histograma que mostra a quantidade de amigos que pessoas de cada idade têm.
@@ -436,7 +436,7 @@ def histogram_friends_qty_by_user_age(num_users):
     # print(ys)
     plt.show()
 
-histogram_friends_qty_by_user_age(num_users)
+# histogram_friends_qty_by_user_age(num_users)
 
 
 # 3 - Escreva uma função que calcula a variância e o desvio padrão da idade das pessoas do sexo masculino que tenham pelo menos 22 anos.
@@ -457,6 +457,108 @@ def desvio_padrao(dados):
     return math.sqrt(variancia(dados))
 
 a = variancia(lista_idades)
-print(a)
+# print(a)
 b = desvio_padrao(lista_idades)
-print(b)
+# print(b)
+
+
+i = [1, 2, 2, 3, 4]
+# print(set(i))
+
+
+# ------------------------ Exercícios Semana 5 ------------------------
+# 1 - Escreva uma função que calcula a covariância entre idade e número de amigos
+def dot(x, y):
+    return sum([x_i * y_i for x_i, y_i in zip(x, y)])
+
+def sum_of_squares(v):
+    return dot(v, v)
+
+def variance(v):
+    mean = sum(v) / len(v)
+    return [v_i - mean for v_i in v]
+
+def covariance(x, y):
+    n = len(x)
+    return dot(variance(x), variance(y)) / (n - 1)
+
+def list_qty_of_friends(users):
+    return [number_of_friends(user) for user in users]
+
+def covariancia_idade_qtd_amigos():
+    li = covariance(lista_idades, [number_of_friends(user) for user in users])
+    print(f'covariance: {li}')
+
+
+# 2 - Escreva uma função que calcula a correlação entre idade e número de amigos.
+def correlation (x, y):
+    desvio_padrao_x = math.sqrt(sum_of_squares(variance(x)) / (len(x)-1))
+    desvio_padrao_y = math.sqrt(sum_of_squares(variance(y)) / (len(y)-1))
+    if desvio_padrao_x > 0 and desvio_padrao_y > 0:
+        return covariance(x, y) / desvio_padrao_x / desvio_padrao_y
+    else:
+        return 0
+
+def correlacao_idade_qtd_amigos():
+    li = [number_of_friends(user) for user in users]
+    print(f'correlation: {correlation (lista_idades, li)}')
+
+
+# 3 - Escreva uma função que devolve uma tupla de duas listas. A primeira lista contém quantidades
+#     de amigos que cada usuário da rede tem. A segunda, quantidades de minutos passados em média
+#     na rede por cada usuário. Cada lista tem tamanho n, sendo n um valor recebido como parâmetro.
+#     Os dados devem ser gerados aleatoriamente. Faça três versões.
+#     3.1 Gere dados aleatoriamente garantindo correlação próxima de 1.
+def qtd_amigos_minutos_em_rede_1(n):
+    v = [random.randint(1, 9) for n in range(n)]
+    w = [v_i * 3 for v_i in v]
+    return (v, w)
+
+def correlacao_amigos_tempo_gasto_1 ():
+    data = qtd_amigos_minutos_em_rede_1(10)
+    # print(data)
+    r = correlation(data[0], data[1])
+    print(f'correlação: {r}')
+
+#   3.2 Gere dados aleatoriamente garantindo correlação próxima de -1.
+def qtd_amigos_minutos_em_rede_2(n):
+    v = [random.randint(1, 9) for n in range(n)]
+    w = [v_i // -4 for v_i in v]
+    return (v, w)
+
+def correlacao_amigos_tempo_gasto_2 ():
+    data = qtd_amigos_minutos_em_rede_2(10)
+    # print(data)
+    r = correlation(data[0], data[1])
+    print(f'correlação: {r}')
+
+#   3.3 Gere dados aleatoriamente garantindo correlação próxima de 0.
+def qtd_amigos_minutos_em_rede_3(n):
+    v = [random.randint(1, 9) for n in range(n)]
+    w = [random.randint(1, 200) for n in range(n)]
+    return (v, w)
+
+def correlacao_amigos_tempo_gasto_3 ():
+    data = qtd_amigos_minutos_em_rede_3(10)
+    # print(data)
+    r = correlation(data[0], data[1])
+    print(f'correlação: {r}')
+
+# 4 - Escreva uma função de teste que mostra que os dados gerados no Exercício 3 estão de acordo
+#     com o solicitado.
+def mostra_dados():
+    print('3.1 - Gere dados aleatoriamente garantindo correlação próxima de 1.')
+    correlacao_amigos_tempo_gasto_1()
+    print('3.2 - Gere dados aleatoriamente garantindo correlação próxima de -1.')
+    correlacao_amigos_tempo_gasto_2()
+    print('3.3 - Gere dados aleatoriamente garantindo correlação próxima de 0.')
+    correlacao_amigos_tempo_gasto_3()
+
+
+def main():
+    covariancia_idade_qtd_amigos()
+    correlacao_idade_qtd_amigos()
+    # qtd_amigos_minutos_em_rede(10)
+    mostra_dados()
+
+main()
