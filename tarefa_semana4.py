@@ -555,10 +555,96 @@ def mostra_dados():
     correlacao_amigos_tempo_gasto_3()
 
 
-def main():
-    covariancia_idade_qtd_amigos()
-    correlacao_idade_qtd_amigos()
-    # qtd_amigos_minutos_em_rede(10)
-    mostra_dados()
+# def main():
+#     covariancia_idade_qtd_amigos()
+#     correlacao_idade_qtd_amigos()
+#     # qtd_amigos_minutos_em_rede(10)
+#     mostra_dados()
+
+# main()
+
+# ------------------------ Exercícios Semana 6 ------------------------
+# 1 - Adicione o atributo intenção de voto à base de dados referente à rede social de cientistas de
+# dados. Sorteie uma intenção de voto para cada usuário da rede. Aumente o tamanho da base de
+# modo que ela tenha 100 usuários. '''
+def aumenta_tamanho_base (base_existente):
+    nova_base = base_existente
+    for i in range (90):
+        registro = {}
+        registro['id'] = 10 + i
+        registro['nome'] = "Novo Usuário " + str(i)
+        registro['friends'] = []
+        registro['gender'] = random.choice (['M', 'F'])
+        registro['age'] = random.randint(18,40)
+        registro['interested_in']: random.choice (['M', 'F', 'A', 'None'])
+        nova_base.append(registro)
+    return nova_base
+
+base = aumenta_tamanho_base(users)
+
+def inclui_intencao_voto_e_salario (lista):
+    for usuario in lista:
+        usuario['salario'] = 1200 + random.random() * 1300
+        usuario['intencao_de_voto'] = random.choice (['Haddad', 'Bolsonaro'])
+        # print(f"Id: {usuario['id']}, salario: {usuario['salario']}, intencao_de_voto: {usuario['intencao_de_voto']}")
+
+inclui_intencao_voto_e_salario(base)
+
+# 2. Há uma técnica para validação de predições realizadas por algoritmos de aprendizado de
+# máquina chamada cross validation leave one out. Ela funciona da seguinte forma.
+# 1. O algoritmo de predição é executado utilizando-se a base inteira exceto uma das instâncias.
+# 2. O resultado obtido é comparado com o valor real.
+# 3. O processo é repetido para cada uma das instâncias.
+# 4. Ao final, exibe-se o percentual de acerto e erro.
+
+# Execute o algoritmo KNN (use K=5) da forma descrita e verifique o resultado. Note que os
+# dados foram gerados aleatoriamente e, portanto, usuários “próximos” não necessariamente têm
+# intenção de voto igual.
+
+def rotulo_de_maior_frequencia (pessoas):
+    frequencias = Counter(pessoa['intencao_de_voto'] for pessoa in pessoas)
+    mais_frequentes = frequencias.most_common(1)
+    return mais_frequentes[0][0]
+
+# rotulo_de_maior_frequencia (base)
+
+def rotulo_de_maior_frequencia_sem_empate (pessoas):
+    frequencias = Counter (pessoa['intencao_de_voto'] for pessoa in pessoas)
+    rotulo, frequencia = frequencias.most_common(1)[0]
+    qtde_de_mais_frequentes = len ([count for count in frequencias.values() if count == frequencia])
+    if qtde_de_mais_frequentes == 1:
+        return rotulo
+    return rotulo_de_maior_frequencia_sem_empate (pessoas[0:len(pessoas) - 1])
+
+# rotulo_de_maior_frequencia_sem_empate (base)
+
+def distance (p1, p2):
+    i = math.pow ((p1['age'] - p2['age']), 2)
+    s = math.pow ((1 if p1['gender'] == "M" else 0) - (1 if p2['gender'] == "M" else 0), 2)
+    sal = math.pow ((p1['salario'] - p2['salario']), 2)
+    return math.sqrt(i + s + sal)
+
+def knn (k, observacoes_rotuladas, nova_observacao):
+    ordenados_pela_distancia = sorted (observacoes_rotuladas, key=lambda obs: distance (obs, nova_observacao))
+    k_mais_proximos = ordenados_pela_distancia[:k]
+    resultado = rotulo_de_maior_frequencia_sem_empate (k_mais_proximos)
+    return resultado
+
+
+def rotacionar (lista, pos):
+    return lista[pos + 1:] + lista[:pos]
+
+
+def cross_validation_leave_one_out(lista):
+    precisao = 0
+    for n in range(len(lista)):
+        resultado = knn(5, rotacionar(lista, n), lista[n])
+        if resultado == lista[n]['intencao_de_voto']:
+            precisao += 1
+    print (f'Taxa de Acerto: {precisao}%, Taxa de Erro: {100 - precisao}%')
+
+def main ():
+    cross_validation_leave_one_out(base)        
+            
 
 main()
